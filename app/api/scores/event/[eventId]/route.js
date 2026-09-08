@@ -1,7 +1,7 @@
-const { NextResponse } = require('next/server');
-const connectDB = require('@/lib/mongodb');
-const Score = require('@/models/Score');
-const { authMiddleware } = require('@/lib/auth');
+import { NextResponse } from 'next/server';
+import connectDB from '../../../../lib/mongodb';
+import Score from '../../../../models/Score';
+import { authMiddleware } from '../../../../lib/auth';
 
 export async function GET(req, { params }) {
   try {

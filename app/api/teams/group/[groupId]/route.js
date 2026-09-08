@@ -1,6 +1,6 @@
-const { NextResponse } = require('next/server');
-const connectDB = require('@/lib/mongodb');
-const Team = require('@/models/Team');
+import { NextResponse } from 'next/server';
+import connectDB from '../../../../lib/mongodb';
+import Team from '../../../../models/Team';
 
 export async function GET(req, { params }) {
   try {

@@ -1,8 +1,8 @@
-const { NextResponse } = require('next/server');
-const connectDB = require('@/lib/mongodb');
-const Score = require('@/models/Score');
-const Team = require('@/models/Team');
-const { authMiddleware } = require('@/lib/auth');
+import { NextResponse } from 'next/server';
+import connectDB from '../../../lib/mongodb';
+import Score from '../../../models/Score';
+import Team from '../../../models/Team';
+import { authMiddleware } from '../../../lib/auth';
 
 export async function POST(req) {
   try {
