@@ -8,7 +8,9 @@ export default function Leaderboard() {
   const [filterGroup, setFilterGroup] = useState('all');
 
   useEffect(() => {
-    fetch('/api/scores/leaderboard').then(r => r.json()).then(setLeaderboard);
+    fetch('/api/scores/leaderboard').then(r => r.json()).then(data => {
+      if (Array.isArray(data)) setLeaderboard(data);
+    });
   }, []);
 
   const getRankClass = (rank) => {
@@ -18,20 +20,24 @@ export default function Leaderboard() {
     return 'bg-white/5 text-dark-400';
   };
 
-  const display = filterGroup === 'all'
-    ? leaderboard
-    : leaderboard.filter(e => e.team?.group?.groupNumber === parseInt(filterGroup));
+  const display = Array.isArray(leaderboard)
+    ? (filterGroup === 'all'
+        ? leaderboard
+        : leaderboard.filter(e => e.team?.group?.groupNumber === parseInt(filterGroup)))
+    : [];
 
   const shown = filterGroup === 'all' ? display.slice(0, 10) : display;
 
-  const totalTribes = leaderboard.length;
-  const totalPoints = leaderboard.reduce((sum, e) => sum + (e.totalPoints || 0), 0);
+  const totalTribes = Array.isArray(leaderboard) ? leaderboard.length : 0;
+  const totalPoints = Array.isArray(leaderboard) ? leaderboard.reduce((sum, e) => sum + (e.totalPoints || 0), 0) : 0;
   const avgPoints = totalTribes > 0 ? Math.round(totalPoints / totalTribes) : 0;
 
   const venueNames = {};
-  leaderboard.forEach(e => {
-    if (e.team?.group) venueNames[e.team.group.groupNumber] = e.team.group.name;
-  });
+  if (Array.isArray(leaderboard)) {
+    leaderboard.forEach(e => {
+      if (e.team?.group) venueNames[e.team.group.groupNumber] = e.team.group.name;
+    });
+  }
 
   return (
     <>
