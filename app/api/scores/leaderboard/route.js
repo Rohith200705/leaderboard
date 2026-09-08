@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import connectDB from '../../../lib/mongodb';
-import Score from '../../../models/Score';
-import Team from '../../../models/Team';
+import connectDB from '@/lib/mongodb';
+import Score from '@/models/Score';
+import Team from '@/models/Team';
 
 export async function GET() {
   try {

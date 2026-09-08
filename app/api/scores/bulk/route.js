@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import connectDB from '../../../lib/mongodb';
-import Score from '../../../models/Score';
-import Team from '../../../models/Team';
-import { authMiddleware } from '../../../lib/auth';
+import connectDB from '@/lib/mongodb';
+import Score from '@/models/Score';
+import Team from '@/models/Team';
+import { authMiddleware } from '@/lib/auth';
 
 export async function POST(req) {
   try {

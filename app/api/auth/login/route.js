@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import connectDB from '../../../lib/mongodb';
-import User from '../../../models/User';
+import connectDB from '@/lib/mongodb';
+import User from '@/models/User';
 import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose';
 
 export async function POST(req) {
   try {
