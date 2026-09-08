@@ -1,10 +1,30 @@
 require('dotenv').config();
-const dns = require('dns');
-dns.setServers(['8.8.8.8', '8.8.4.4']);
 const mongoose = require('mongoose');
-const User = require('./models/User');
-const Team = require('./models/Team');
-const Group = require('./models/Group');
+
+const MONGODB_URI = process.env.MONGODB_URI;
+
+const groupSchema = new mongoose.Schema({
+  groupNumber: { type: Number, required: true, unique: true },
+  name: { type: String, required: true },
+  venue: { type: String, required: true }
+});
+
+const userSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: { type: String, enum: ['host'], default: 'host' },
+  group: { type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: true }
+});
+
+const teamSchema = new mongoose.Schema({
+  tribeNumber: { type: Number, required: true },
+  name: { type: String, required: true },
+  group: { type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: true }
+});
+
+const Group = mongoose.models.Group || mongoose.model('Group', groupSchema);
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+const Team = mongoose.models.Team || mongoose.model('Team', teamSchema);
 
 const groups = [
   { groupNumber: 1, name: 'KRS Seminar Hall', venue: 'KRS Seminar Hall' },
@@ -23,7 +43,7 @@ const hosts = [
 ];
 
 async function seed() {
-  await mongoose.connect(process.env.MONGODB_URI);
+  await mongoose.connect(MONGODB_URI);
   console.log('Connected to MongoDB');
 
   try { await mongoose.connection.dropCollection('users'); } catch(e) {}
