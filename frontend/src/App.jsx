@@ -36,7 +36,7 @@ function Login() {
   return (
     <div className="login-container">
       <div className="login-box">
-        <h2>Host Login</h2>
+        <h2>Group Leader Login</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Email</label>
@@ -56,11 +56,10 @@ function Login() {
 
 function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState([]);
-  const [events, setEvents] = useState([]);
+  const [filterGroup, setFilterGroup] = useState('all');
 
   useEffect(() => {
     fetch(`${API}/scores/leaderboard`).then(r => r.json()).then(setLeaderboard);
-    fetch(`${API}/events`).then(r => r.json()).then(setEvents);
   }, []);
 
   const getRankClass = (rank) => {
@@ -70,22 +69,43 @@ function Leaderboard() {
     return 'rank-default';
   };
 
+  const display = filterGroup === 'all'
+    ? leaderboard
+    : leaderboard.filter(e => e.team?.group?.groupNumber === parseInt(filterGroup));
+
+  const shown = filterGroup === 'all' ? display.slice(0, 10) : display;
+
   return (
     <div className="leaderboard-page">
       <div className="page-header">
         <h2>Leaderboard</h2>
         <p>September 2026 | Working Days: 8, 9, 10, 11, 15</p>
       </div>
+
+      <div className="filter-bar">
+        <span className="filter-label">Filter by Group:</span>
+        {['all', '1', '2', '3', '4', '5'].map(g => (
+          <button
+            key={g}
+            className={`filter-btn ${filterGroup === g ? 'active' : ''}`}
+            onClick={() => setFilterGroup(g)}
+          >
+            {g === 'all' ? 'All Groups' : `Group ${String.fromCharCode(64 + parseInt(g))}`}
+          </button>
+        ))}
+      </div>
+
       <table className="leaderboard-table">
         <thead>
           <tr>
             <th>Rank</th>
-            <th>Team</th>
+            <th>Tribe</th>
+            <th>Group</th>
             <th>Total Points</th>
           </tr>
         </thead>
         <tbody>
-          {leaderboard.slice(0, 10).map((entry) => (
+          {shown.map((entry) => (
             <tr key={entry.team?._id}>
               <td>
                 <span className={`rank-badge ${getRankClass(entry.rank)}`}>
@@ -93,18 +113,19 @@ function Leaderboard() {
                 </span>
               </td>
               <td style={{ fontWeight: 600 }}>{entry.team?.name}</td>
+              <td style={{ color: '#aaa' }}>{entry.team?.group?.name}</td>
               <td><span className="points-badge">{entry.totalPoints}</span></td>
             </tr>
           ))}
-          {leaderboard.length > 10 && (
+          {filterGroup === 'all' && leaderboard.length > 10 && (
             <tr>
-              <td colSpan="3" style={{ textAlign: 'center', color: '#888', padding: '16px', fontSize: '1.1rem', letterSpacing: '6px' }}>
+              <td colSpan="4" style={{ textAlign: 'center', color: '#888', padding: '16px', fontSize: '1.1rem', letterSpacing: '6px' }}>
                 . . . . .
               </td>
             </tr>
           )}
-          {leaderboard.length === 0 && (
-            <tr><td colSpan="3" className="no-event">No scores yet</td></tr>
+          {shown.length === 0 && (
+            <tr><td colSpan="4" className="no-event">No scores yet</td></tr>
           )}
         </tbody>
       </table>
@@ -113,6 +134,7 @@ function Leaderboard() {
 }
 
 function Admin() {
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
   const [events, setEvents] = useState([]);
   const [teams, setTeams] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState('');
@@ -125,7 +147,11 @@ function Admin() {
 
   useEffect(() => {
     loadEvents();
-    fetch(`${API}/teams`).then(r => r.json()).then(setTeams);
+    if (user?.group?.id) {
+      fetch(`${API}/teams/group/${user.group.id}`, { headers: getHeaders() })
+        .then(r => r.json())
+        .then(setTeams);
+    }
   }, []);
 
   useEffect(() => {
@@ -177,12 +203,13 @@ function Admin() {
       points: scores[t._id] || 0
     }));
     try {
-      await fetch(`${API}/scores/bulk`, {
+      const res = await fetch(`${API}/scores/bulk`, {
         method: 'POST',
         headers: getHeaders(),
         body: JSON.stringify({ eventId: selectedEvent, scores: scoreArray })
       });
-      setMessage('Scores saved!');
+      const data = await res.json();
+      setMessage(`Scores saved! (${data.count} tribes updated)`);
       setTimeout(() => setMessage(''), 3000);
     } catch (err) {
       setMessage('Error saving scores');
@@ -194,7 +221,8 @@ function Admin() {
   return (
     <div className="admin-page">
       <div className="page-header">
-        <h2>Admin Dashboard</h2>
+        <h2>{user?.group?.name || 'Dashboard'}</h2>
+        <p style={{ color: '#aaa' }}>Venue: {user?.group?.venue} | Tribes: {teams.length}</p>
       </div>
 
       {message && <p style={{ textAlign: 'center', color: '#ffd200', marginBottom: 20 }}>{message}</p>}
@@ -211,7 +239,7 @@ function Admin() {
             <select value={newEventDate} onChange={e => setNewEventDate(e.target.value)} required>
               <option value="">Select date</option>
               {workingDates.map(d => (
-                <option key={d} value={d}>{new Date(d).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}</option>
+                <option key={d} value={d}>{new Date(d + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}</option>
               ))}
             </select>
           </div>
@@ -229,7 +257,7 @@ function Admin() {
               <div key={ev._id} className="event-card" style={{ borderColor: selectedEvent === ev._id ? '#ffd200' : undefined }}>
                 <div className="event-info">
                   <span>{ev.name}</span>
-                  <span>{new Date(ev.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+                  <span>{new Date(ev.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
                 </div>
                 <div style={{ display: 'flex', gap: 6 }}>
                   <button className="btn btn-secondary btn-small" onClick={() => setSelectedEvent(ev._id)}>
@@ -245,7 +273,10 @@ function Admin() {
 
       {selectedEvent && (
         <div className="admin-section">
-          <h3>Enter Scores — {events.find(e => e._id === selectedEvent)?.name} <span style={{fontSize:'0.75rem', color:'#aaa', fontWeight:400}}>(max 100 per event)</span></h3>
+          <h3>
+            Score: {events.find(e => e._id === selectedEvent)?.name}
+            <span style={{ fontSize: '0.75rem', color: '#aaa', fontWeight: 400 }}> (max 100 per tribe)</span>
+          </h3>
           <div className="score-grid">
             {teams.map(team => (
               <div key={team._id} className="score-item">
@@ -293,7 +324,7 @@ function Navbar() {
             <button onClick={handleLogout}>Logout</button>
           </>
         ) : (
-          <Link to="/login">Host Login</Link>
+          <Link to="/login">Group Login</Link>
         )}
       </nav>
     </div>

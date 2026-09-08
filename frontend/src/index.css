@@ -266,6 +266,42 @@ body {
   font-size: 0.9rem;
 }
 
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-label {
+  color: #aaa;
+  font-size: 0.85rem;
+  margin-right: 4px;
+}
+
+.filter-btn {
+  padding: 6px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #aaa;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.3s;
+}
+
+.filter-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.filter-btn.active {
+  background: rgba(255, 210, 0, 0.15);
+  border-color: #ffd200;
+  color: #ffd200;
+}
+
 /* Admin Dashboard */
 .admin-page {
   max-width: 1200px;

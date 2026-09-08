@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 
 const teamSchema = new mongoose.Schema({
-  teamNumber: { type: Number, required: true, unique: true },
-  name: { type: String, required: true }
+  tribeNumber: { type: Number, required: true },
+  name: { type: String, required: true },
+  group: { type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: true }
 });
 
 module.exports = mongoose.model('Team', teamSchema);
