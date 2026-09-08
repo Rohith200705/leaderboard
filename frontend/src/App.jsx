@@ -440,11 +440,11 @@ function Navbar() {
 
 function ProtectedRoute({ children }) {
   const user = JSON.parse(localStorage.getItem('user') || 'null');
-  if (!user) return <Navigate to="/login" />;
-  if (!user.group?.id) {
+  if (!user || !user.group?.id) {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    return <Navigate to="/login" />;
+    window.location.replace('/login');
+    return null;
   }
   return children;
 }
