@@ -134,7 +134,7 @@ function Leaderboard() {
               className={`filter-btn ${filterGroup === g ? 'active' : ''}`}
               onClick={() => setFilterGroup(g)}
             >
-              {g === 'all' ? 'All Groups' : `Group ${String.fromCharCode(64 + parseInt(g))}`}
+              {g === 'all' ? 'All Venues' : leaderboard.find(e => e.team?.group?.groupNumber === parseInt(g))?.team?.group?.name || `Venue ${g}`}
             </button>
           ))}
         </div>
@@ -440,7 +440,13 @@ function Navbar() {
 
 function ProtectedRoute({ children }) {
   const user = JSON.parse(localStorage.getItem('user') || 'null');
-  return user ? children : <Navigate to="/login" />;
+  if (!user) return <Navigate to="/login" />;
+  if (!user.group?.id) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    return <Navigate to="/login" />;
+  }
+  return children;
 }
 
 export default function App() {

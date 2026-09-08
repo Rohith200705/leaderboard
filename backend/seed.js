@@ -7,19 +7,19 @@ const Team = require('./models/Team');
 const Group = require('./models/Group');
 
 const groups = [
-  { groupNumber: 1, name: 'Group A', venue: 'Venue 1' },
-  { groupNumber: 2, name: 'Group B', venue: 'Venue 2' },
-  { groupNumber: 3, name: 'Group C', venue: 'Venue 3' },
-  { groupNumber: 4, name: 'Group D', venue: 'Venue 4' },
-  { groupNumber: 5, name: 'Group E', venue: 'Venue 5' }
+  { groupNumber: 1, name: 'KRS Seminar Hall', venue: 'KRS Seminar Hall' },
+  { groupNumber: 2, name: 'ECE Seminar Hall', venue: 'ECE Seminar Hall' },
+  { groupNumber: 3, name: 'Civil Seminar Hall', venue: 'Civil Seminar Hall' },
+  { groupNumber: 4, name: 'MS Auditorium', venue: 'MS Auditorium' },
+  { groupNumber: 5, name: 'MCW', venue: 'MCW' }
 ];
 
 const hosts = [
-  { email: 'group1@leader.com', password: '123' },
-  { email: 'group2@leader.com', password: '123' },
-  { email: 'group3@leader.com', password: '123' },
-  { email: 'group4@leader.com', password: '123' },
-  { email: 'group5@leader.com', password: '123' }
+  { email: 'krs@leader.com', password: '123' },
+  { email: 'ece@leader.com', password: '123' },
+  { email: 'civil@leader.com', password: '123' },
+  { email: 'ms@leader.com', password: '123' },
+  { email: 'mcw@leader.com', password: '123' }
 ];
 
 async function seed() {
