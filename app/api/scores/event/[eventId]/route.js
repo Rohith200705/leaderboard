@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import Score from '@/models/Score';
+import { Score } from '@/lib/models';
 import { authMiddleware } from '@/lib/auth';
 
 export async function GET(req, { params }) {

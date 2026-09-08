@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import Event from '@/models/Event';
+import { Event } from '@/lib/models';
 import { authMiddleware } from '@/lib/auth';
 
 export async function DELETE(req, { params }) {

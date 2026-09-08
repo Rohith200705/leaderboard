@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import User from '@/models/User';
+import { User } from '@/lib/models';
 import jwt from 'jsonwebtoken';
 
 export async function POST(req) {
