@@ -202,12 +202,20 @@ function Admin() {
   useEffect(() => {
     loadEvents();
     if (user?.group?.id) {
+      console.log('Fetching teams for group:', user.group.id);
       fetch(`${API}/teams/group/${user.group.id}`, { headers: getHeaders() })
         .then(r => r.json())
         .then(data => {
+          console.log('Teams response:', data);
           if (Array.isArray(data)) setTeams(data);
+          else setMessage('Failed to load tribes: ' + JSON.stringify(data));
         })
-        .catch(() => {});
+        .catch(err => {
+          console.error('Teams fetch error:', err);
+          setMessage('Failed to load tribes');
+        });
+    } else {
+      console.log('No group ID found in user:', user);
     }
   }, []);
 
