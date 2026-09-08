@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const scoreSchema = new mongoose.Schema({
   team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team', required: true },
@@ -8,4 +8,4 @@ const scoreSchema = new mongoose.Schema({
 
 scoreSchema.index({ team: 1, event: 1 }, { unique: true });
 
-module.exports = mongoose.models.Score || mongoose.model('Score', scoreSchema);
+export default mongoose.models.Score || mongoose.model('Score', scoreSchema);

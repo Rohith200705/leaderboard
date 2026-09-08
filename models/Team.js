@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const teamSchema = new mongoose.Schema({
   tribeNumber: { type: Number, required: true },
@@ -6,4 +6,4 @@ const teamSchema = new mongoose.Schema({
   group: { type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: true }
 });
 
-module.exports = mongoose.models.Team || mongoose.model('Team', teamSchema);
+export default mongoose.models.Team || mongoose.model('Team', teamSchema);
