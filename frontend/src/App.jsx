@@ -3,6 +3,13 @@ import { BrowserRouter as Router, Routes, Route, Link, Navigate, useNavigate } f
 
 const API = '/api';
 
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+}
+
 function getHeaders() {
   const token = localStorage.getItem('token');
   return token ? { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
@@ -197,21 +204,27 @@ function Admin() {
     if (user?.group?.id) {
       fetch(`${API}/teams/group/${user.group.id}`, { headers: getHeaders() })
         .then(r => r.json())
-        .then(setTeams);
+        .then(data => {
+          if (Array.isArray(data)) setTeams(data);
+        })
+        .catch(() => {});
     }
   }, []);
 
   useEffect(() => {
-    if (selectedEvent) {
+    if (selectedEvent && teams.length > 0) {
       fetch(`${API}/scores/event/${selectedEvent}`, { headers: getHeaders() })
         .then(r => r.json())
         .then(data => {
           const map = {};
-          data.forEach(s => { map[s.team?._id] = s.points; });
+          if (Array.isArray(data)) {
+            data.forEach(s => { if (s.team) map[s.team._id] = s.points; });
+          }
           setScores(map);
-        });
+        })
+        .catch(() => {});
     }
-  }, [selectedEvent]);
+  }, [selectedEvent, teams.length]);
 
   const handleCreateEvent = async (e) => {
     e.preventDefault();
@@ -314,7 +327,7 @@ function Admin() {
             <select value={newEventDate} onChange={e => setNewEventDate(e.target.value)} required>
               <option value="">Select date</option>
               {workingDates.map(d => (
-                <option key={d} value={d}>{new Date(d + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}</option>
+                <option key={d} value={d}>{formatDate(d)}</option>
               ))}
             </select>
           </div>
@@ -335,7 +348,7 @@ function Admin() {
               >
                 <div className="event-info">
                   <span>{ev.name}</span>
-                  <span>{new Date(ev.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+                  <span>{formatDate(ev.date)}</span>
                 </div>
                 <div style={{ display: 'flex', gap: 6 }}>
                   <button className="btn btn-secondary btn-small" onClick={() => setSelectedEvent(ev._id)}>
